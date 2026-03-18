@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import subprocess
 import sys
 import time
@@ -28,6 +29,19 @@ def resolve_vision_model_path() -> Path:
     if VISION_SK_PATH.exists():
         return VISION_SK_PATH
     return VISION_TF_PATH
+
+
+def is_streamlit_cloud() -> bool:
+    if os.environ.get("STREAMLIT_CLOUD"):
+        return True
+    if Path("/mount/src").exists():
+        return True
+    if Path("/home/appuser").exists():
+        return True
+    return False
+
+
+IS_CLOUD = is_streamlit_cloud()
 
 st.set_page_config(page_title="Phishing Detection System", layout="wide")
 
@@ -382,7 +396,13 @@ with st.sidebar:
     weight_vision = st.slider("Weight: Vision", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
     st.caption("Weights are normalized automatically.")
 
-    use_selenium = st.checkbox("Capture screenshot from URL (Selenium)", value=True)
+    use_selenium = st.checkbox(
+        "Capture screenshot from URL (Selenium)",
+        value=False if IS_CLOUD else True,
+        disabled=IS_CLOUD,
+    )
+    if IS_CLOUD:
+        st.info("Selenium is disabled on Streamlit Cloud. Upload a screenshot instead.")
     browser = st.selectbox("Browser", ["chrome", "edge"], index=0)
     driver_path = st.text_input("WebDriver path (optional)", value="")
 
@@ -399,7 +419,7 @@ with st.sidebar:
         st.warning("Vision model missing")
 
     st.subheader("Utilities")
-    demo_btn = st.button("Generate Demo Data")
+    demo_btn = st.button("Generate Demo Models")
     nlp_data_path = st.text_input("NLP dataset path", value="data/demo_emails.csv")
     nlp_text_col = st.text_input("NLP text column", value="text")
     nlp_label_col = st.text_input("NLP label column", value="label")
@@ -407,7 +427,11 @@ with st.sidebar:
 
     vision_data_path = st.text_input("Vision dataset path", value="data/screenshots")
     vision_epochs = st.number_input("Vision epochs", min_value=1, max_value=20, value=3, step=1)
-    vision_backend = st.selectbox("Vision backend", ["auto", "tensorflow", "sklearn"], index=0)
+    vision_backend = st.selectbox(
+        "Vision backend",
+        ["auto", "tensorflow", "sklearn"],
+        index=2 if IS_CLOUD else 0,
+    )
     vision_weights = st.selectbox("Vision weights", ["imagenet", "none"], index=1)
     train_vision_btn = st.button("Train Vision Model")
 
@@ -458,6 +482,8 @@ def get_vision_component(model_path: Path):
 
 
 def _image_to_base64(path: Path) -> str:
+    if not path.exists():
+        return ""
     data = path.read_bytes()
     return base64.b64encode(data).decode("ascii")
 
@@ -548,9 +574,32 @@ def _render_final_banner(score: float | None) -> str:
 
 if demo_btn:
     try:
-        with st.spinner("Generating demo data..."):
+        with st.spinner("Generating demo data and models..."):
             subprocess.run([sys.executable, "demo_setup.py"], check=True, cwd=BASE_DIR)
-        st.success("Demo data generated in data/")
+
+            demo_email_path = BASE_DIR / "data" / "demo_emails.csv"
+            train_nlp_model(
+                data_path=demo_email_path,
+                model_dir=MODEL_DIR,
+                text_col="text",
+                label_col="label",
+            )
+
+            cmd = [
+                sys.executable,
+                "vision_train.py",
+                "--data-dir",
+                str(BASE_DIR / "data" / "screenshots"),
+                "--backend",
+                "sklearn",
+                "--epochs",
+                "3",
+            ]
+            subprocess.run(cmd, check=True, cwd=BASE_DIR)
+
+        get_nlp_components.clear()
+        get_vision_component.clear()
+        st.success("Demo models generated in models/")
     except Exception as exc:
         st.error(f"Demo setup failed: {exc}")
 
@@ -617,16 +666,17 @@ if analyze:
         try:
             OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
             timestamp = int(time.time())
-            screenshot_path = OUTPUT_DIR / f"capture_{timestamp}.png"
             url_to_use = url_input.strip() or auto_url
             with st.spinner("Capturing screenshot..."):
+                temp_path = OUTPUT_DIR / f"capture_{timestamp}.png"
                 capture_screenshot(
                     url_to_use,
-                    screenshot_path,
+                    temp_path,
                     driver_path=driver_path or None,
                     browser=browser,
                     headless=True,
                 )
+            screenshot_path = temp_path
         except Exception as exc:
             st.error(f"Screenshot capture failed: {exc}")
 
@@ -650,6 +700,8 @@ if analyze:
     col1, col2, col3 = st.columns(3)
 
     image_b64 = _image_to_base64(screenshot_path) if screenshot_path else None
+    if image_b64 == "":
+        image_b64 = None
 
     with col1:
         st.markdown(_render_nlp_card(nlp_score), unsafe_allow_html=True)

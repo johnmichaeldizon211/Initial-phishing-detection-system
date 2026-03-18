@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+
+# Envs
+.venv/
+venv/
+
+# Streamlit
+.streamlit/
+
+# Data & artifacts
+models/
+outputs/
+data/
+
+# OS
+.DS_Store
+Thumbs.db

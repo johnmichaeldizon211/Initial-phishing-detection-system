@@ -1,0 +1,211 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    background-color: #e9effb;
+    overflow-x: hidden;
+}
+
+.main-container {
+    width: 100vw;
+    min-height: 100vh;
+    background-color: #f4f7fc;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background-color: #1e4b8a;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+    width: 100%;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.shield-icon { font-size: 2.2rem; }
+.logo h1 { font-size: 1.8rem; font-weight: 500; }
+
+.input-section {
+    padding: 40px 10%;
+    text-align: center;
+}
+
+.text-box {
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 25px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 20px;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.analyze-btn {
+    background-color: #337ab7;
+    color: white;
+    border: none;
+    padding: 12px 60px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 0px #245680;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    padding: 10px 5% 30px;
+    flex-grow: 1;
+}
+
+.card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+    background-color: #f8f9fa;
+    padding: 12px;
+    font-size: 1.1rem;
+    color: #334e68;
+    border-bottom: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.card-inner {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.score-badge {
+    padding: 15px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.green { background-color: #5cb85c; border-bottom: 5px solid #4cae4c; }
+.red { background-color: #d9534f; border-bottom: 5px solid #d43f3a; }
+
+.status-text { text-align: center; color: #333; font-weight: 500; }
+
+.screenshot-preview {
+    border: 1px solid #ddd;
+    background-color: #f1f4f9;
+    margin-bottom: 15px;
+}
+
+.mock-browser-header {
+    background-color: #234e82;
+    color: white;
+    font-size: 0.8rem;
+    padding: 8px;
+    text-align: center;
+}
+
+.mock-form { padding: 15px; background: white; }
+
+.mock-label {
+    display: block;
+    text-align: left;
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.input-line {
+    border: 1px solid #ccc;
+    height: 25px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.mock-button {
+    background-color: #337ab7;
+    color: white;
+    font-size: 0.8rem;
+    padding: 8px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.warning-text { color: #d9534f; font-weight: bold; text-align: center; font-size: 0.9rem; }
+
+.final-result-container {
+    padding: 30px 5% 50px;
+}
+
+.final-result {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: 5px solid #d9534f; 
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 25px 40px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.shield-circle {
+    width: 80px;
+    height: 80px;
+    background-color: #d9534f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    margin-right: 30px;
+    box-shadow: 0 0 0 10px rgba(217, 83, 79, 0.1);
+}
+
+.alert-title { color: #d9534f; font-size: 1.8rem; font-weight: bold; }
+.alert-details p { color: #555; font-size: 1.1rem; }
+
+.combined-score {
+    background-color: #1c334d;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    margin-left: auto;
+}
+
+.combined-score strong { font-size: 1.5rem; }
+
+/* Mobile View */
+@media (max-width: 900px) {
+    .results-grid { grid-template-columns: 1fr; }
+    .final-result { flex-direction: column; text-align: center; gap: 20px; }
+    .combined-score { margin-left: 0; width: 100%; }
+}

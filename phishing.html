@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection System - Full Access</title>
+    <link rel="stylesheet" href="phishing.css">
+</head>
+<body>
+
+    <div class="main-container">
+        <header class="header">
+            <div class="logo">
+                <span class="shield-icon">🛡️</span>
+                <h1>Phishing Detection System</h1>
+            </div>
+        </header>
+
+        <section class="input-section">
+            <p>Paste the suspicious email text below and click "Analyze".</p>
+            <div class="text-box">
+                <p>Dear Customer,</p>
+                <p>Please urgent! Your account has been compromised. Click the link below to secure your account:</p>
+                <a href="#">http://fakebank-login.com/verify</a>
+            </div>
+            <button class="analyze-btn">Analyze</button>
+        </section>
+
+        <section class="results-grid">
+            <div class="card">
+                <h3>NLP Analysis</h3>
+                <div class="card-inner">
+                    <div class="score-badge green">
+                        Phishing Score : 78%
+                    </div>
+                    <p class="status-text">Suspicious Language Detected</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Website Screenshot</h3>
+                <div class="card-inner">
+                    <div class="screenshot-preview">
+                        <div class="mock-browser-header">
+                            <span>👤 FakeBank Secure Login</span>
+                        </div>
+                        <div class="mock-form">
+                            <label class="mock-label">User name</label>
+                            <div class="input-line"></div>
+                            <label class="mock-label">Password</label>
+                            <div class="input-line"></div>
+                            <div class="mock-button">★★★</div>
+                        </div>
+                    </div>
+                    <p class="warning-text">⚠️ Potential Phishing Site</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Vision Analysis</h3>
+                <div class="card-inner">
+                    <div class="score-badge red">
+                        Website Risk : 85%
+                    </div>
+                    <p class="status-text">Fake Page Elements Found</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="final-result-container">
+            <div class="final-result">
+                <div class="alert-shield-icon">
+                    <div class="shield-circle">
+                        <span class="inner-shield">🛡️</span>
+                        <span class="exclamation">!</span>
+                    </div>
+                </div>
+                <div class="alert-details">
+                    <h2 class="alert-title">Phishing Detected!</h2>
+                    <p>High Risk of Phishing Attack</p>
+                </div>
+                <div class="combined-score">
+                    Combined Score : <strong>82%</strong>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>

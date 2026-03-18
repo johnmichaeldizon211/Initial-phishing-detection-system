@@ -1,0 +1,10 @@
+streamlit
+scikit-learn
+pandas
+numpy
+joblib
+beautifulsoup4
+lxml
+selenium
+pillow
+tensorflow; python_version < "3.13"

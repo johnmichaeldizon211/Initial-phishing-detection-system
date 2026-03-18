@@ -53,15 +53,17 @@ html, body, [class*="css"] {
 }
 
 .block-container {
-  padding: 0 5% 2rem;
+  padding: 1.25rem 5% 2rem;
   max-width: 1200px;
 }
 
 .header-bar {
   background: var(--blue-dark);
   color: white;
-  padding: 16px 0;
+  padding: 26px 0 22px;
   margin: 0 -5% 28px;
+  position: relative;
+  z-index: 2;
 }
 
 .header-inner {
@@ -71,12 +73,22 @@ html, body, [class*="css"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
+  min-height: 52px;
 }
 
 .header-title {
   font-size: 1.8rem;
   font-weight: 500;
+  line-height: 1.25;
+  padding-top: 4px;
+  display: block;
+}
+
+.shield-icon {
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 .shield-icon {

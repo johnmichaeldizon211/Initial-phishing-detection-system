@@ -33,10 +33,9 @@ python vision_train.py --data-dir data/screenshots --backend tensorflow --epochs
 
 ## Streamlit Deploy
 1. Push this repo to GitHub
-2. Go to Streamlit Community Cloud → New app
+2. Go to Streamlit Community Cloud ? New app
 3. Select `app.py`
 4. `runtime.txt` pins Python 3.11 for TensorFlow compatibility
-5. `packages.txt` installs system libs used by vision dependencies
 
 ## Notes
 - `data/`, `models/`, and `outputs/` are ignored in git.

@@ -399,10 +399,9 @@ with st.sidebar:
     use_selenium = st.checkbox(
         "Capture screenshot from URL (Selenium)",
         value=False if IS_CLOUD else True,
-        disabled=IS_CLOUD,
     )
-    if IS_CLOUD:
-        st.info("Selenium is disabled on Streamlit Cloud. Upload a screenshot instead.")
+    if IS_CLOUD and use_selenium:
+        st.warning("Selenium may fail on Streamlit Cloud. Upload a screenshot if capture fails.")
     browser = st.selectbox("Browser", ["chrome", "edge"], index=0)
     driver_path = st.text_input("WebDriver path (optional)", value="")
 

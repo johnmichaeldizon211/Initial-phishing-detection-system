@@ -79,7 +79,8 @@ def main() -> None:
         stratify=labels,
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    # Use slow tokenizer to avoid fast-tokenizer backend issues on some setups.
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=False)
     train_enc = tokenizer(
         x_train,
         truncation=True,

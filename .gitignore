@@ -10,6 +10,7 @@ __pycache__/
 # Envs
 .venv/
 venv/
+.venv311/
 
 # Streamlit
 .streamlit/

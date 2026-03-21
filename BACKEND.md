@@ -31,6 +31,24 @@ Outputs:
 - `models/nlp_model.joblib`
 - `models/nlp_report.json`
 
+## 2B. Train BERT-tiny (optional, better accuracy)
+
+Install the extra dependencies:
+
+```
+pip install -r requirements-bert.txt
+```
+
+Then run:
+
+```
+python bert_train.py --data data/emails.csv --text-col "Email Text" --label-col "Email Type"
+```
+
+Outputs:
+- `models/bert_tiny/`
+- `models/bert_tiny/bert_report.json`
+
 ## 3. Train the vision model
 
 Prepare screenshots in this structure:

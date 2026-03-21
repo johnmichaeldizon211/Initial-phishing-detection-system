@@ -45,6 +45,51 @@ IS_CLOUD = is_streamlit_cloud()
 
 st.set_page_config(page_title="Phishing Detection System", layout="wide")
 
+def _models_ready() -> bool:
+    nlp_ok = (MODEL_DIR / "tfidf.joblib").exists() and (MODEL_DIR / "nlp_model.joblib").exists()
+    vision_ok = VISION_TF_PATH.exists() or VISION_SK_PATH.exists()
+    return nlp_ok and vision_ok
+
+
+def _auto_generate_demo_models():
+    if not IS_CLOUD:
+        return
+    if _models_ready():
+        return
+    if st.session_state.get("auto_demo_done"):
+        return
+
+    st.session_state["auto_demo_done"] = True
+    try:
+        with st.spinner("Setting up demo models for Streamlit Cloud..."):
+            subprocess.run([sys.executable, "demo_setup.py"], check=True, cwd=BASE_DIR)
+
+            demo_email_path = BASE_DIR / "data" / "demo_emails.csv"
+            train_nlp_model(
+                data_path=demo_email_path,
+                model_dir=MODEL_DIR,
+                text_col="text",
+                label_col="label",
+            )
+
+            cmd = [
+                sys.executable,
+                "vision_train.py",
+                "--data-dir",
+                str(BASE_DIR / "data" / "screenshots"),
+                "--backend",
+                "sklearn",
+                "--epochs",
+                "3",
+            ]
+            subprocess.run(cmd, check=True, cwd=BASE_DIR)
+        st.success("Demo models ready.")
+    except Exception as exc:
+        st.error(f"Auto demo setup failed: {exc}")
+
+
+_auto_generate_demo_models()
+
 CUSTOM_CSS = """
 <style>
 :root {

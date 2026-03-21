@@ -169,8 +169,16 @@ def main() -> None:
         }
         sig = inspect.signature(TrainingArguments.__init__).parameters
         filtered = {k: v for k, v in base_kwargs.items() if k in sig}
-        if "evaluation_strategy" not in filtered and "do_eval" in sig:
-            filtered["do_eval"] = True
+        if "evaluation_strategy" not in filtered:
+            # Older transformers: avoid mismatched save/eval strategies.
+            for key in ("save_strategy", "load_best_model_at_end", "metric_for_best_model"):
+                filtered.pop(key, None)
+            if "do_eval" in sig:
+                filtered["do_eval"] = True
+        else:
+            # Keep save/eval strategies consistent.
+            if "save_strategy" in filtered:
+                filtered["save_strategy"] = filtered["evaluation_strategy"]
         return TrainingArguments(**filtered)
 
     training_args = _build_training_args()

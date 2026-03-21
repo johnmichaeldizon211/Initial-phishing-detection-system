@@ -183,15 +183,17 @@ def main() -> None:
 
     training_args = _build_training_args()
 
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_ds,
-        eval_dataset=test_ds,
-        tokenizer=tokenizer,
-        data_collator=data_collator,
-        compute_metrics=compute_metrics,
-    )
+    trainer_kwargs = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": train_ds,
+        "eval_dataset": test_ds,
+        "data_collator": data_collator,
+        "compute_metrics": compute_metrics,
+    }
+    if "tokenizer" in inspect.signature(Trainer.__init__).parameters:
+        trainer_kwargs["tokenizer"] = tokenizer
+    trainer = Trainer(**trainer_kwargs)
 
     trainer.train()
     metrics = trainer.evaluate()

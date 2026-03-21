@@ -296,6 +296,11 @@ section[data-testid="stSidebar"] div[data-testid="stSelectbox"] > div {
   border-bottom: 5px solid #d43f3a;
 }
 
+.score-muted {
+  background: #9aa6b2;
+  border-bottom: 5px solid #8b96a1;
+}
+
 .status-text {
   text-align: center;
   color: #333;
@@ -442,6 +447,13 @@ with st.sidebar:
     st.header("Settings")
     weight_nlp = st.slider("Weight: NLP", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
     weight_vision = st.slider("Weight: Vision", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
+    vision_threshold = st.slider(
+        "Vision threshold",
+        min_value=0.0,
+        max_value=1.0,
+        value=VISION_THRESHOLD,
+        step=0.05,
+    )
     st.caption("Weights are normalized automatically.")
 
     use_selenium = st.checkbox(
@@ -535,16 +547,28 @@ def _image_to_base64(path: Path) -> str:
     return base64.b64encode(data).decode("ascii")
 
 
-def _score_badge(label: str, score: float | None, threshold: float = 0.5) -> str:
+def _score_badge(
+    label: str,
+    score: float | None,
+    threshold: float = 0.5,
+    enabled: bool = True,
+) -> str:
     if score is None:
         return f'<div class="score-badge score-good">{label}: --</div>'
+    if not enabled:
+        return f'<div class="score-badge score-muted">{label}: {score * 100:.1f}% (ignored)</div>'
     css_class = "score-bad" if score >= threshold else "score-good"
     return f'<div class="score-badge {css_class}">{label}: {score * 100:.1f}%</div>'
 
 
-def _render_nlp_card(score: float | None) -> str:
-    status = "Suspicious language detected" if (score or 0) >= NLP_THRESHOLD else "Language looks safe"
-    badge = _score_badge("Phishing Score", score, NLP_THRESHOLD)
+def _render_nlp_card(score: float | None, threshold: float, enabled: bool) -> str:
+    if score is None:
+        status = "NLP score unavailable"
+    elif not enabled:
+        status = "NLP weight is 0 (ignored)"
+    else:
+        status = "Suspicious language detected" if (score or 0) >= threshold else "Language looks safe"
+    badge = _score_badge("Phishing Score", score, threshold, enabled)
     return f"""
     <div class="card">
       <h3>NLP Analysis</h3>
@@ -556,10 +580,18 @@ def _render_nlp_card(score: float | None) -> str:
     """
 
 
-def _render_screenshot_card(image_b64: str | None, score: float | None) -> str:
+def _render_screenshot_card(
+    image_b64: str | None,
+    score: float | None,
+    threshold: float,
+    enabled: bool,
+) -> str:
     if image_b64:
         preview = f'<img class="screenshot-img" src="data:image/png;base64,{image_b64}" />'
-        warning = "Potential phishing site" if (score or 0) >= VISION_THRESHOLD else "Site looks safe"
+        if not enabled:
+            warning = "Vision weight is 0 (ignored)"
+        else:
+            warning = "Potential phishing site" if (score or 0) >= threshold else "Site looks safe"
     else:
         preview = """
         <div class="mock-browser-header">Login page preview</div>
@@ -584,9 +616,14 @@ def _render_screenshot_card(image_b64: str | None, score: float | None) -> str:
     """
 
 
-def _render_vision_card(score: float | None) -> str:
-    status = "Fake page elements found" if (score or 0) >= VISION_THRESHOLD else "Site looks safe"
-    badge = _score_badge("Website Risk", score, VISION_THRESHOLD)
+def _render_vision_card(score: float | None, threshold: float, enabled: bool) -> str:
+    if score is None:
+        status = "Vision score unavailable"
+    elif not enabled:
+        status = "Vision weight is 0 (ignored)"
+    else:
+        status = "Fake page elements found" if (score or 0) >= threshold else "Site looks safe"
+    badge = _score_badge("Website Risk", score, threshold, enabled)
     return f"""
     <div class="card">
       <h3>Vision Analysis</h3>
@@ -741,6 +778,8 @@ if analyze:
             st.error(f"Vision analysis failed: {exc}")
 
     combined_score = combine_scores(nlp_score, vision_score, weight_nlp, weight_vision)
+    nlp_enabled = weight_nlp > 0
+    vision_enabled = weight_vision > 0
     terms_list: list[dict] = []
 
     st.markdown('<div class="section-title">Results</div>', unsafe_allow_html=True)
@@ -751,11 +790,17 @@ if analyze:
         image_b64 = None
 
     with col1:
-        st.markdown(_render_nlp_card(nlp_score), unsafe_allow_html=True)
+        st.markdown(_render_nlp_card(nlp_score, NLP_THRESHOLD, nlp_enabled), unsafe_allow_html=True)
     with col2:
-        st.markdown(_render_screenshot_card(image_b64, vision_score), unsafe_allow_html=True)
+        st.markdown(
+            _render_screenshot_card(image_b64, vision_score, vision_threshold, vision_enabled),
+            unsafe_allow_html=True,
+        )
     with col3:
-        st.markdown(_render_vision_card(vision_score), unsafe_allow_html=True)
+        st.markdown(
+            _render_vision_card(vision_score, vision_threshold, vision_enabled),
+            unsafe_allow_html=True,
+        )
 
     st.markdown('<div class="section-title">Final Verdict</div>', unsafe_allow_html=True)
     st.markdown(_render_final_banner(combined_score), unsafe_allow_html=True)
@@ -778,6 +823,11 @@ if analyze:
         "top_nlp_terms": terms_list,
         "weights": {"nlp": weight_nlp, "vision": weight_vision},
         "vision_backend": vision_backend_used,
+        "thresholds": {
+            "nlp": NLP_THRESHOLD,
+            "vision": vision_threshold,
+            "combined": COMBINED_THRESHOLD,
+        },
     }
 
     st.download_button(

@@ -96,6 +96,7 @@ python eval_vision.py --data-dir data/screenshots --model-path models/vision_mod
 Combined evaluation (requires paired CSV with email + screenshot path):
 
 ```
+python build_pairs.py --emails data/emails.csv --text-col "Email Text" --label-col "Email Type" --screenshots data/screenshots --out data/pairs.csv
 python eval_combined.py --pairs data/pairs.csv --weight-nlp 0.5 --weight-vision 0.5
 ```
 
@@ -134,3 +135,9 @@ Vision (MobileNetV2, TensorFlow) on `data/screenshots` (40 legit / 40 phishing):
 
 Note: With this dataset, the model ranks well (AUC=1.0) but is threshold-sensitive. Lowering
 the threshold to 0.1 improved F1. Re-tune threshold when adding more real screenshots.
+
+Combined (NLP + Vision) on `data/pairs.csv` (80 pairs, weights 0.5/0.5, threshold 0.5):
+- F1: `0.947`
+- ROC-AUC: `1.000`
+- Confusion matrix (`true_legit/true_phish` x `pred_legit/pred_phish`): `[[40, 0], [4, 36]]`
+- Output saved to `outputs/combined_eval.json`

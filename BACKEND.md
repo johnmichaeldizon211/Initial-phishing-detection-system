@@ -61,6 +61,31 @@ If TensorFlow is not available, the sklearn fallback will save:
 streamlit run app.py
 ```
 
+## 5. Evaluation (Required for report)
+
+NLP evaluation:
+
+```
+python eval_nlp.py --data data/emails.csv --text-col "Email Text" --label-col "Email Type"
+```
+
+Vision evaluation (requires screenshots dataset):
+
+```
+python eval_vision.py --data-dir data/screenshots --model-path models/vision_model.keras
+```
+
+Combined evaluation (requires paired CSV with email + screenshot path):
+
+```
+python eval_combined.py --pairs data/pairs.csv --weight-nlp 0.5 --weight-vision 0.5
+```
+
+Outputs are saved to `outputs/`:
+- `nlp_eval.json`, `nlp_confusion.csv`, `nlp_misclassified.csv`
+- `vision_eval.json`, `vision_confusion.csv`, `vision_misclassified.csv`
+- `combined_eval.json`, `combined_confusion.csv`
+
 ## Quick Demo (No Kaggle needed)
 
 Generate a small synthetic dataset and (optionally) train models:

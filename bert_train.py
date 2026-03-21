@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
+    BertTokenizer,
     DataCollatorWithPadding,
     Trainer,
     TrainingArguments,
@@ -79,8 +80,12 @@ def main() -> None:
         stratify=labels,
     )
 
-    # Use slow tokenizer to avoid fast-tokenizer backend issues on some setups.
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=False)
+    # Prefer slow tokenizer to avoid fast-tokenizer backend issues on some setups.
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=False)
+    except Exception:
+        # Fallback for environments missing fast-tokenizer backends.
+        tokenizer = BertTokenizer.from_pretrained(args.model_name)
     train_enc = tokenizer(
         x_train,
         truncation=True,

@@ -452,7 +452,7 @@ with st.sidebar:
         min_value=0.0,
         max_value=1.0,
         value=VISION_THRESHOLD,
-        step=0.05,
+        step=0.01,
     )
     st.caption("Weights are normalized automatically.")
 

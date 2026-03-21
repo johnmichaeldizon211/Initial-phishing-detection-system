@@ -1,0 +1,12 @@
+# Add one URL per line (safe, publicly accessible pages).
+# You can replace these with your own allowed/approved sites.
+https://www.wikipedia.org/
+https://www.python.org/
+https://www.mozilla.org/
+https://www.w3.org/
+https://www.gnu.org/
+https://www.khanacademy.org/
+https://www.nationalgeographic.com/
+https://www.bbc.com/
+https://www.nasa.gov/
+https://www.example.com/

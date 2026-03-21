@@ -59,6 +59,12 @@ data/screenshots/
   legit/
 ```
 
+You can bulk-capture legit screenshots locally with Selenium:
+
+```
+python bulk_capture.py --urls sample_legit_urls.txt --out-dir data/screenshots/legit --browser chrome --headless
+```
+
 Then run:
 
 ```

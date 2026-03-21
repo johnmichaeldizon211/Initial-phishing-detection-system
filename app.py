@@ -21,6 +21,9 @@ MODEL_DIR = BASE_DIR / "models"
 OUTPUT_DIR = BASE_DIR / "outputs"
 VISION_TF_PATH = MODEL_DIR / "vision_model.keras"
 VISION_SK_PATH = MODEL_DIR / "vision_sklearn.joblib"
+NLP_THRESHOLD = 0.5
+VISION_THRESHOLD = 0.1
+COMBINED_THRESHOLD = 0.5
 
 
 def resolve_vision_model_path() -> Path:
@@ -532,16 +535,16 @@ def _image_to_base64(path: Path) -> str:
     return base64.b64encode(data).decode("ascii")
 
 
-def _score_badge(label: str, score: float | None) -> str:
+def _score_badge(label: str, score: float | None, threshold: float = 0.5) -> str:
     if score is None:
         return f'<div class="score-badge score-good">{label}: --</div>'
-    css_class = "score-bad" if score >= 0.5 else "score-good"
+    css_class = "score-bad" if score >= threshold else "score-good"
     return f'<div class="score-badge {css_class}">{label}: {score * 100:.1f}%</div>'
 
 
 def _render_nlp_card(score: float | None) -> str:
-    status = "Suspicious language detected" if (score or 0) >= 0.5 else "Language looks safe"
-    badge = _score_badge("Phishing Score", score)
+    status = "Suspicious language detected" if (score or 0) >= NLP_THRESHOLD else "Language looks safe"
+    badge = _score_badge("Phishing Score", score, NLP_THRESHOLD)
     return f"""
     <div class="card">
       <h3>NLP Analysis</h3>
@@ -556,7 +559,7 @@ def _render_nlp_card(score: float | None) -> str:
 def _render_screenshot_card(image_b64: str | None, score: float | None) -> str:
     if image_b64:
         preview = f'<img class="screenshot-img" src="data:image/png;base64,{image_b64}" />'
-        warning = "Potential phishing site" if (score or 0) >= 0.5 else "Site looks safe"
+        warning = "Potential phishing site" if (score or 0) >= VISION_THRESHOLD else "Site looks safe"
     else:
         preview = """
         <div class="mock-browser-header">Login page preview</div>
@@ -582,8 +585,8 @@ def _render_screenshot_card(image_b64: str | None, score: float | None) -> str:
 
 
 def _render_vision_card(score: float | None) -> str:
-    status = "Fake page elements found" if (score or 0) >= 0.5 else "Site looks safe"
-    badge = _score_badge("Website Risk", score)
+    status = "Fake page elements found" if (score or 0) >= VISION_THRESHOLD else "Site looks safe"
+    badge = _score_badge("Website Risk", score, VISION_THRESHOLD)
     return f"""
     <div class="card">
       <h3>Vision Analysis</h3>
@@ -601,8 +604,8 @@ def _render_final_banner(score: float | None) -> str:
         detail = "Run NLP and/or vision analysis to get a combined score."
         combined = "--"
     else:
-        title = "Phishing detected!" if score >= 0.5 else "Likely safe"
-        detail = "High risk of phishing attack" if score >= 0.5 else "Low risk detected"
+        title = "Phishing detected!" if score >= COMBINED_THRESHOLD else "Likely safe"
+        detail = "High risk of phishing attack" if score >= COMBINED_THRESHOLD else "Low risk detected"
         combined = f"{score * 100:.1f}%"
 
     return f"""
@@ -769,7 +772,7 @@ if analyze:
         "nlp_score": nlp_score,
         "vision_score": vision_score,
         "combined_score": combined_score,
-        "verdict": "phishing" if (combined_score or 0) >= 0.5 else "likely_safe",
+        "verdict": "phishing" if (combined_score or 0) >= COMBINED_THRESHOLD else "likely_safe",
         "url_used": url_input.strip() or auto_url or None,
         "screenshot_path": str(screenshot_path) if screenshot_path else None,
         "top_nlp_terms": terms_list,

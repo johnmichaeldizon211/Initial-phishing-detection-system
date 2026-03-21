@@ -47,7 +47,7 @@ def main() -> None:
     parser.add_argument("--data", required=True, help="Path to CSV dataset.")
     parser.add_argument("--text-col", default=None, help="Column name for email text.")
     parser.add_argument("--label-col", default=None, help="Column name for labels.")
-    parser.add_argument("--model-name", default="prajjwal1/bert-tiny")
+    parser.add_argument("--model-name", default="google/bert_uncased_L-2_H-128_A-2")
     parser.add_argument("--model-out", default="models/bert_tiny")
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=16)
@@ -80,12 +80,24 @@ def main() -> None:
         stratify=labels,
     )
 
-    # Prefer slow tokenizer to avoid fast-tokenizer backend issues on some setups.
+    model_name = args.model_name
+    fallback_model = "google/bert_uncased_L-2_H-128_A-2"
+
+    def _load_tokenizer(name: str):
+        # Prefer slow tokenizer to avoid fast-tokenizer backend issues on some setups.
+        try:
+            return AutoTokenizer.from_pretrained(name, use_fast=False)
+        except Exception:
+            # Fallback for environments missing fast-tokenizer backends.
+            return BertTokenizer.from_pretrained(name)
+
     try:
-        tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=False)
-    except Exception:
-        # Fallback for environments missing fast-tokenizer backends.
-        tokenizer = BertTokenizer.from_pretrained(args.model_name)
+        tokenizer = _load_tokenizer(model_name)
+    except Exception as exc:
+        print(f"Tokenizer load failed for {model_name}: {exc}")
+        print(f"Falling back to {fallback_model}.")
+        model_name = fallback_model
+        tokenizer = _load_tokenizer(model_name)
     train_enc = tokenizer(
         x_train,
         truncation=True,
@@ -102,10 +114,23 @@ def main() -> None:
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-    model = AutoModelForSequenceClassification.from_pretrained(
-        args.model_name,
-        num_labels=2,
-    )
+    try:
+        model = AutoModelForSequenceClassification.from_pretrained(
+            model_name,
+            num_labels=2,
+        )
+    except Exception as exc:
+        if model_name != fallback_model:
+            print(f"Model load failed for {model_name}: {exc}")
+            print(f"Falling back to {fallback_model}.")
+            model_name = fallback_model
+            tokenizer = _load_tokenizer(model_name)
+            model = AutoModelForSequenceClassification.from_pretrained(
+                model_name,
+                num_labels=2,
+            )
+        else:
+            raise
 
     def compute_metrics(eval_pred):
         logits, labels_np = eval_pred
@@ -163,7 +188,7 @@ def main() -> None:
     tokenizer.save_pretrained(output_dir)
 
     report_payload = {
-        "model_name": args.model_name,
+        "model_name": model_name,
         "f1": float(metrics.get("eval_f1", 0.0)),
         "roc_auc": float(metrics.get("eval_roc_auc", 0.0)),
         "precision": float(metrics.get("eval_precision", 0.0)),

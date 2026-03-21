@@ -16,11 +16,14 @@ from .utils import clean_email_text, ensure_dir
 
 LABEL_MAP = {
     "phishing": 1,
+    "phishing email": 1,
     "phish": 1,
     "malicious": 1,
     "spam": 1,
     "legit": 0,
     "legitimate": 0,
+    "safe": 0,
+    "safe email": 0,
     "ham": 0,
     "benign": 0,
 }

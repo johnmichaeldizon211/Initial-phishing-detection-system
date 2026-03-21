@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import inspect
 from pathlib import Path
 
 import numpy as np
@@ -151,20 +152,28 @@ def main() -> None:
     output_dir = Path(args.model_out)
     ensure_dir(output_dir)
 
-    training_args = TrainingArguments(
-        output_dir=str(output_dir / "checkpoints"),
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
-        save_total_limit=1,
-        learning_rate=args.learning_rate,
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
-        num_train_epochs=args.epochs,
-        weight_decay=0.01,
-        load_best_model_at_end=True,
-        metric_for_best_model="f1",
-        logging_steps=50,
-    )
+    def _build_training_args() -> TrainingArguments:
+        base_kwargs = {
+            "output_dir": str(output_dir / "checkpoints"),
+            "evaluation_strategy": "epoch",
+            "save_strategy": "epoch",
+            "save_total_limit": 1,
+            "learning_rate": args.learning_rate,
+            "per_device_train_batch_size": args.batch_size,
+            "per_device_eval_batch_size": args.batch_size,
+            "num_train_epochs": args.epochs,
+            "weight_decay": 0.01,
+            "load_best_model_at_end": True,
+            "metric_for_best_model": "f1",
+            "logging_steps": 50,
+        }
+        sig = inspect.signature(TrainingArguments.__init__).parameters
+        filtered = {k: v for k, v in base_kwargs.items() if k in sig}
+        if "evaluation_strategy" not in filtered and "do_eval" in sig:
+            filtered["do_eval"] = True
+        return TrainingArguments(**filtered)
+
+    training_args = _build_training_args()
 
     trainer = Trainer(
         model=model,

@@ -454,6 +454,10 @@ with st.sidebar:
         value=VISION_THRESHOLD,
         step=0.01,
     )
+    invert_vision = st.checkbox(
+        "Invert vision score (use if model is flipped)",
+        value=False,
+    )
     st.caption("Weights are normalized automatically.")
 
     use_selenium = st.checkbox(
@@ -774,6 +778,8 @@ if analyze:
             if isinstance(vision_model, tuple) and len(vision_model) == 2:
                 vision_backend_used = vision_model[0]
             vision_score = predict_vision_proba(screenshot_path, vision_model)
+            if invert_vision and vision_score is not None:
+                vision_score = 1.0 - vision_score
         except Exception as exc:
             st.error(f"Vision analysis failed: {exc}")
 
@@ -828,6 +834,7 @@ if analyze:
             "vision": vision_threshold,
             "combined": COMBINED_THRESHOLD,
         },
+        "invert_vision": invert_vision,
     }
 
     st.download_button(

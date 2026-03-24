@@ -130,20 +130,26 @@ Notes:
 To capture live screenshots, install Chrome or Edge WebDriver and set the path in the app sidebar.
 For safety, run on a VM or sandbox environment.
 
-## Latest Local Evaluation Results (2026-03-21)
+## Latest Local Evaluation Results (2026-03-22)
+
+NLP (TF-IDF + Logistic Regression) on `data/emails.csv`:
+- F1: `0.960`
+- ROC-AUC: `0.995`
+- Accuracy: `0.968`
+- Report saved to `models/nlp_report.json`
 
 Vision (MobileNetV2, TensorFlow) on `data/screenshots` (40 legit / 40 phishing):
 - Threshold: `0.10`
 - F1: `0.667`
-- ROC-AUC: `1.000`
+- ROC-AUC: `0.225`
 - Confusion matrix (`true_legit/true_phish` x `pred_legit/pred_phish`): `[[0, 40], [0, 40]]`
 - Misclassified examples saved to `outputs/vision_misclassified.csv`
 
-Note: With this dataset, the model ranks well (AUC=1.0) but is threshold-sensitive. Lowering
-the threshold to 0.1 improved F1. Re-tune threshold when adding more real screenshots.
+Note: The current vision model appears flipped on this dataset (AUC < 0.5). Use the
+Invert Vision toggle in the app or retrain with more legit screenshots.
 
 Combined (NLP + Vision) on `data/pairs.csv` (80 pairs, weights 0.5/0.5, threshold 0.5):
-- F1: `0.947`
+- F1: `0.920`
 - ROC-AUC: `1.000`
-- Confusion matrix (`true_legit/true_phish` x `pred_legit/pred_phish`): `[[40, 0], [4, 36]]`
+- Confusion matrix (`true_legit/true_phish` x `pred_legit/pred_phish`): `[[33, 7], [0, 40]]`
 - Output saved to `outputs/combined_eval.json`

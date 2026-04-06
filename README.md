@@ -17,9 +17,9 @@ TensorFlow is not available on Python 3.14, so the vision model uses the **sklea
 
 ```bash
 pip install -r requirements.txt
-python demo_setup.py
-python nlp_train.py --data data/demo_emails.csv --text-col text --label-col label
-python vision_train.py --data-dir data/screenshots --backend sklearn --epochs 3
+python scripts/demo_setup.py
+python scripts/nlp_train.py --data data/demo_emails.csv --text-col text --label-col label
+python scripts/vision_train.py --data-dir data/screenshots --backend sklearn --epochs 3
 streamlit run app.py
 ```
 
@@ -28,7 +28,7 @@ Use Python 3.11/3.12 if you want MobileNetV2 (TensorFlow):
 
 ```bash
 pip install -r requirements.txt
-python vision_train.py --data-dir data/screenshots --backend tensorflow --epochs 5
+python scripts/vision_train.py --data-dir data/screenshots --backend tensorflow --epochs 5
 ```
 
 ## Streamlit Deploy

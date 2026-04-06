@@ -108,7 +108,7 @@ def main() -> None:
     parser.add_argument("--vision-weights", default="imagenet", help="Pass weights to vision training.")
     args = parser.parse_args()
 
-    base_dir = Path(__file__).resolve().parent
+    base_dir = Path(__file__).resolve().parent.parent
     data_dir = base_dir / args.out_dir
     data_dir.mkdir(parents=True, exist_ok=True)
 
@@ -131,7 +131,7 @@ def main() -> None:
         print("Training vision model...")
         cmd = [
             sys.executable,
-            "vision_train.py",
+            "scripts/vision_train.py",
             "--data-dir",
             str(screenshots_dir),
             "--epochs",

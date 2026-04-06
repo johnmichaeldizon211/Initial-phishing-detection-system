@@ -21,7 +21,7 @@ Notes:
 Place your email dataset CSV in `data/` and run:
 
 ```
-python nlp_train.py --data data/emails.csv --text-col text --label-col label
+python scripts/nlp_train.py --data data/emails.csv --text-col text --label-col label
 ```
 
 If your dataset uses different column names, set `--text-col` and `--label-col` accordingly.
@@ -42,7 +42,7 @@ pip install -r requirements-bert.txt
 Then run:
 
 ```
-python bert_train.py --data data/emails.csv --text-col "Email Text" --label-col "Email Type"
+python scripts/bert_train.py --data data/emails.csv --text-col "Email Text" --label-col "Email Type"
 ```
 
 Outputs:
@@ -62,13 +62,13 @@ data/screenshots/
 You can bulk-capture legit screenshots locally with Selenium:
 
 ```
-python bulk_capture.py --urls sample_legit_urls.txt --out-dir data/screenshots/legit --browser chrome --headless
+python scripts/bulk_capture.py --urls scripts/sample_legit_urls.txt --out-dir data/screenshots/legit --browser chrome --headless
 ```
 
 Then run:
 
 ```
-python vision_train.py --data-dir data/screenshots --epochs 5
+python scripts/vision_train.py --data-dir data/screenshots --epochs 5
 ```
 
 Outputs:
@@ -90,20 +90,20 @@ streamlit run app.py
 NLP evaluation:
 
 ```
-python eval_nlp.py --data data/emails.csv --text-col "Email Text" --label-col "Email Type"
+python scripts/eval_nlp.py --data data/emails.csv --text-col "Email Text" --label-col "Email Type"
 ```
 
 Vision evaluation (requires screenshots dataset):
 
 ```
-python eval_vision.py --data-dir data/screenshots --model-path models/vision_model.keras
+python scripts/eval_vision.py --data-dir data/screenshots --model-path models/vision_model.keras
 ```
 
 Combined evaluation (requires paired CSV with email + screenshot path):
 
 ```
-python build_pairs.py --emails data/emails.csv --text-col "Email Text" --label-col "Email Type" --screenshots data/screenshots --out data/pairs.csv
-python eval_combined.py --pairs data/pairs.csv --weight-nlp 0.5 --weight-vision 0.5
+python scripts/build_pairs.py --emails data/emails.csv --text-col "Email Text" --label-col "Email Type" --screenshots data/screenshots --out data/pairs.csv
+python scripts/eval_combined.py --pairs data/pairs.csv --weight-nlp 0.5 --weight-vision 0.5
 ```
 
 Outputs are saved to `outputs/`:
@@ -116,9 +116,9 @@ Outputs are saved to `outputs/`:
 Generate a small synthetic dataset and (optionally) train models:
 
 ```
-python demo_setup.py
-python nlp_train.py --data data/demo_emails.csv --text-col text --label-col label
-python vision_train.py --data-dir data/screenshots --epochs 3 --backend auto --weights none
+python scripts/demo_setup.py
+python scripts/nlp_train.py --data data/demo_emails.csv --text-col text --label-col label
+python scripts/vision_train.py --data-dir data/screenshots --epochs 3 --backend auto --weights none
 ```
 
 Notes:

@@ -65,7 +65,7 @@ def _auto_generate_demo_models():
     st.session_state["auto_demo_done"] = True
     try:
         with st.spinner("Setting up demo models for Streamlit Cloud..."):
-            subprocess.run([sys.executable, "demo_setup.py"], check=True, cwd=BASE_DIR)
+            subprocess.run([sys.executable, "scripts/demo_setup.py"], check=True, cwd=BASE_DIR)
 
             demo_email_path = BASE_DIR / "data" / "demo_emails.csv"
             train_nlp_model(
@@ -77,7 +77,7 @@ def _auto_generate_demo_models():
 
             cmd = [
                 sys.executable,
-                "vision_train.py",
+                "scripts/vision_train.py",
                 "--data-dir",
                 str(BASE_DIR / "data" / "screenshots"),
                 "--backend",
@@ -663,7 +663,7 @@ def _render_final_banner(score: float | None) -> str:
 if demo_btn:
     try:
         with st.spinner("Generating demo data and models..."):
-            subprocess.run([sys.executable, "demo_setup.py"], check=True, cwd=BASE_DIR)
+            subprocess.run([sys.executable, "scripts/demo_setup.py"], check=True, cwd=BASE_DIR)
 
             demo_email_path = BASE_DIR / "data" / "demo_emails.csv"
             train_nlp_model(
@@ -675,7 +675,7 @@ if demo_btn:
 
             cmd = [
                 sys.executable,
-                "vision_train.py",
+                "scripts/vision_train.py",
                 "--data-dir",
                 str(BASE_DIR / "data" / "screenshots"),
                 "--backend",
@@ -718,7 +718,7 @@ if train_vision_btn:
             with st.spinner("Training vision model..."):
                 cmd = [
                     sys.executable,
-                    "vision_train.py",
+                    "scripts/vision_train.py",
                     "--data-dir",
                     str(data_path),
                     "--epochs",

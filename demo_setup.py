@@ -28,10 +28,10 @@ LEGIT_TEMPLATES = [
 
 BRANDS = ["Metro Bank", "PaySecure", "CloudMail", "ShopWorld", "UniPortal"]
 PHISH_URLS = [
-    "http://secure-login-update.com/verify",
-    "http://account-confirmation.net/login",
-    "http://bank-security-alert.info/confirm",
-    "http://payment-issue-alert.com/update",
+    "https://example.com/verify",
+    "https://example.com/login",
+    "https://example.com/security",
+    "https://example.com/account",
 ]
 
 
